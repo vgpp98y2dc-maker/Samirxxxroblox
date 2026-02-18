@@ -1,0 +1,45 @@
+-- Librería de Interfaz (Kavo)
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/78n/Kavo-UI-Library/main/source.lua"))()
+
+-- Ventana Principal (220x220)
+local Window = Library:CreateWindow({
+    Title = "ZL PVP V0.1",
+    Theme = {
+        MainColor = Color3.fromRGB(20, 20, 20),
+        AccentColor = Color3.fromRGB(212, 175, 55)
+    },
+    Size = Vector2.new(220, 220)
+})
+
+-- Pestañas
+local Tab1 = Window:CreateTab("Com") -- Combat
+local Tab2 = Window:CreateTab("Mov") -- Movement
+local Tab3 = Window:CreateTab("Uti") -- Utility
+local Tab4 = Window:CreateTab("Key") -- Credits
+
+-- Funciones de Movimiento (Tab 2)
+Tab2:CreateSlider("Speed Boost", 16, 250, 16, function(v)
+    game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = v
+end)
+
+Tab2:CreateToggle("Infinite Jump", function(state)
+    _G.InfiniteJump = state
+    game:GetService("UserInputService").JumpRequest:Connect(function()
+        if _G.InfiniteJump then
+            game.Players.LocalPlayer.Character:FindFirstChildOfClass('Humanoid'):ChangeState("Jumping")
+        end
+    end)
+end)
+
+-- Funciones de Utilidad (Tab 3)
+Tab3:CreateButton("Activar ESP (Basic)", function()
+    print("ESP Activado")
+    -- Aquí puedes añadir tu script de ESP favorito
+end)
+
+-- Pestaña de Key/Créditos (Tab 4)
+Tab4:CreateLabel("Owner: ZL")
+Tab4:CreateLabel("Versión: 0.1")
+Tab4:CreateButton("Copiar Discord", function()
+    setclipboard("discord.gg/zlpvp")
+end)
