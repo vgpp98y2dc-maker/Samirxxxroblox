@@ -73,23 +73,6 @@ Section2:CreateToggle("INFINITE JUMP", function(state)
     end)
 end)
 
-Section2:CreateToggle("FLY (VOLAR)", function(state)
-    _G.Fly = state
-    local lp = game.Players.LocalPlayer
-    if state then
-        task.spawn(function()
-            local bv = Instance.new("BodyVelocity", lp.Character.HumanoidRootPart)
-            bv.Velocity = Vector3.new(0,0,0)
-            bv.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
-            while _G.Fly do
-                bv.Velocity = lp.Character.Humanoid.MoveDirection * 50
-                task.wait()
-            end
-            bv:Destroy()
-        end)
-    end
-end)
-
 Section2:CreateToggle("ANTI KNOCKBACK", function(state)
     local hrp = game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart")
     hrp.CustomPhysicalProperties = state and PhysicalProperties.new(100, 0.3, 0.5) or nil
@@ -131,10 +114,10 @@ Section3:CreateToggle("ESP HIGHLIGHT", function(state)
     end
 end)
 
--- PESTAÑA 4: Key (Config)
+-- PESTAÑA 4: Key (Configuración)
 local Tab4 = Window:CreateTab("Key")
 local Section4 = Tab4:CreateSection("CRÉDITOS")
 Section4:CreateLabel("Owner: ZL")
 Section4:CreateButton("GUARDAR CONFIG", function()
-    print("ZL Hub: Configuración Guardada.")
+    print("ZL Hub: Guardado.")
 end)
