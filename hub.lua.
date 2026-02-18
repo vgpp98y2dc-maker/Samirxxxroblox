@@ -1,44 +1,40 @@
---[[
-    ZL PVP V0.1
-    Asegúrate de copiar TODO este código y pegarlo en tu archivo de GitHub.
-]]
+local ScreenGui = Instance.new("ScreenGui", game.CoreGui)
+local Main = Instance.new("Frame", ScreenGui)
+Main.Name = "ZL_Hub"
+Main.Size = UDim2.new(0, 220, 0, 220)
+Main.Position = UDim2.new(1, -230, 0, 50) -- Aparece arriba a la derecha
+Main.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+Main.BorderSizePixel = 2
+Main.BorderColor3 = Color3.fromRGB(212, 175, 55) -- Borde Dorado
 
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/78n/Kavo-UI-Library/main/source.lua"))()
+local Title = Instance.new("TextLabel", Main)
+Title.Size = UDim2.new(1, 0, 0, 30)
+Title.Text = "ZL PVP V0.1"
+Title.TextColor3 = Color3.fromRGB(212, 175, 55)
+Title.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 
-local Window = Library:CreateWindow({
-    Title = "ZL PVP V0.1",
-    Theme = {
-        MainColor = Color3.fromRGB(20, 20, 20),
-        AccentColor = Color3.fromRGB(212, 175, 55)
-    },
-    Size = Vector2.new(220, 220)
-})
+-- Función para crear botones rápido
+local function createBtn(name, pos, func)
+    local b = Instance.new("TextButton", Main)
+    b.Size = UDim2.new(0, 100, 0, 35)
+    b.Position = pos
+    b.Text = name
+    b.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    b.TextColor3 = Color3.new(1,1,1)
+    b.MouseButton1Click:Connect(func)
+end
 
--- Pestañas
-local Tab1 = Window:CreateTab("Com")
-local Tab2 = Window:CreateTab("Mov")
-local Tab3 = Window:CreateTab("Uti")
-local Tab4 = Window:CreateTab("Key")
-
--- Movimiento
-Tab2:CreateSlider("Velocidad", 16, 250, 16, function(v)
-    game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = v
+-- Botones (Funciones básicas que pediste)
+createBtn("Speed 100", UDim2.new(0, 5, 0, 40), function() 
+    game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 100 
 end)
 
-Tab2:CreateToggle("Salto Infinito", function(state)
-    _G.InfJump = state
+createBtn("Inf Jump", UDim2.new(0, 115, 0, 40), function() 
+    _G.IJ = not _G.IJ
     game:GetService("UserInputService").JumpRequest:Connect(function()
-        if _G.InfJump then
-            game.Players.LocalPlayer.Character:FindFirstChildOfClass('Humanoid'):ChangeState("Jumping")
-        end
+        if _G.IJ then game.Players.LocalPlayer.Character:FindFirstChildOfClass('Humanoid'):ChangeState("Jumping") end
     end)
 end)
 
--- Utilidades
-Tab3:CreateButton("Activar ESP", function()
-    print("ESP Activado")
-end)
-
--- Créditos
-Tab4:CreateLabel("Owner: ZL")
-Tab4:CreateLabel("Versión: 0.1")
+createBtn("ESP", UDim2.new(0, 5, 0, 85), function() print("ESP Activo") end)
+createBtn("Reset", UDim2.new(0, 115, 0, 85), function() game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 16 end)
