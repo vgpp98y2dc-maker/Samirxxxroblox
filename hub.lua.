@@ -1,40 +1,140 @@
-local ScreenGui = Instance.new("ScreenGui", game.CoreGui)
-local Main = Instance.new("Frame", ScreenGui)
-Main.Name = "ZL_Hub"
-Main.Size = UDim2.new(0, 220, 0, 220)
-Main.Position = UDim2.new(1, -230, 0, 50) -- Aparece arriba a la derecha
-Main.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-Main.BorderSizePixel = 2
-Main.BorderColor3 = Color3.fromRGB(212, 175, 55) -- Borde Dorado
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/78n/Kavo-UI-Library/main/source.lua"))()
+local Window = Library:CreateWindow({
+    Title = "ZL PVP V0.1",
+    Theme = {
+        MainColor = Color3.fromRGB(20, 20, 20),
+        AccentColor = Color3.fromRGB(212, 175, 55)
+    }
+})
 
-local Title = Instance.new("TextLabel", Main)
-Title.Size = UDim2.new(1, 0, 0, 30)
-Title.Text = "ZL PVP V0.1"
-Title.TextColor3 = Color3.fromRGB(212, 175, 55)
-Title.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+-- PESTAÑA 1: Com (Combate)
+local Tab1 = Window:CreateTab("Com")
+local Section1 = Tab1:CreateSection("COMBATE")
 
--- Función para crear botones rápido
-local function createBtn(name, pos, func)
-    local b = Instance.new("TextButton", Main)
-    b.Size = UDim2.new(0, 100, 0, 35)
-    b.Position = pos
-    b.Text = name
-    b.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-    b.TextColor3 = Color3.new(1,1,1)
-    b.MouseButton1Click:Connect(func)
-end
-
--- Botones (Funciones básicas que pediste)
-createBtn("Speed 100", UDim2.new(0, 5, 0, 40), function() 
-    game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 100 
-end)
-
-createBtn("Inf Jump", UDim2.new(0, 115, 0, 40), function() 
-    _G.IJ = not _G.IJ
-    game:GetService("UserInputService").JumpRequest:Connect(function()
-        if _G.IJ then game.Players.LocalPlayer.Character:FindFirstChildOfClass('Humanoid'):ChangeState("Jumping") end
+Section1:CreateToggle("AIMBOT", function(state)
+    _G.Aimbot = state
+    game:GetService("RunService").RenderStepped:Connect(function()
+        if _G.Aimbot then
+            local target = nil
+            local dist = 500
+            for _, v in pairs(game.Players:GetPlayers()) do
+                if v ~= game.Players.LocalPlayer and v.Character and v.Character:FindFirstChild("HumanoidRootPart") then
+                    local d = (v.Character.HumanoidRootPart.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude
+                    if d < dist then
+                        dist = d
+                        target = v.Character.HumanoidRootPart
+                    end
+                end
+            end
+            if target then
+                workspace.CurrentCamera.CFrame = CFrame.new(workspace.CurrentCamera.CFrame.Position, target.Position)
+            end
+        end
     end)
 end)
 
-createBtn("ESP", UDim2.new(0, 5, 0, 85), function() print("ESP Activo") end)
-createBtn("Reset", UDim2.new(0, 115, 0, 85), function() game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 16 end)
+Section1:CreateToggle("SPIN BOT", function(state)
+    _G.SpinBot = state
+    task.spawn(function()
+        while _G.SpinBot do
+            if game.Players.LocalPlayer.Character then
+                game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame *= CFrame.Angles(0, math.rad(50), 0)
+            end
+            task.wait()
+        end
+    end)
+end)
+
+Section1:CreateToggle("AUTO BAT", function(state)
+    _G.AutoBat = state
+    task.spawn(function()
+        while _G.AutoBat do
+            local tool = game.Players.LocalPlayer.Character:FindFirstChildOfClass("Tool")
+            if tool then tool:Activate() end
+            task.wait(0.1)
+        end
+    end)
+end)
+
+-- PESTAÑA 2: Mov (Movimiento)
+local Tab2 = Window:CreateTab("Mov")
+local Section2 = Tab2:CreateSection("MOVIMIENTO")
+
+Section2:CreateSlider("SPEED BOOST", 16, 250, 28, function(s)
+    game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = s
+end)
+
+Section2:CreateToggle("INFINITE JUMP", function(state)
+    _G.InfJump = state
+    game:GetService("UserInputService").JumpRequest:Connect(function()
+        if _G.InfJump then
+            game.Players.LocalPlayer.Character:FindFirstChildOfClass('Humanoid'):ChangeState("Jumping")
+        end
+    end)
+end)
+
+Section2:CreateToggle("FLY (VOLAR)", function(state)
+    _G.Fly = state
+    local lp = game.Players.LocalPlayer
+    if state then
+        task.spawn(function()
+            local bv = Instance.new("BodyVelocity", lp.Character.HumanoidRootPart)
+            bv.Velocity = Vector3.new(0,0,0)
+            bv.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+            while _G.Fly do
+                bv.Velocity = lp.Character.Humanoid.MoveDirection * 50
+                task.wait()
+            end
+            bv:Destroy()
+        end)
+    end
+end)
+
+Section2:CreateToggle("ANTI KNOCKBACK", function(state)
+    local hrp = game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart")
+    hrp.CustomPhysicalProperties = state and PhysicalProperties.new(100, 0.3, 0.5) or nil
+end)
+
+-- PESTAÑA 3: Uti (Utilidad)
+local Tab3 = Window:CreateTab("Uti")
+local Section3 = Tab3:CreateSection("UTILIDADES")
+
+Section3:CreateToggle("AUTO STEAL", function(state)
+    _G.AutoSteal = state
+    task.spawn(function()
+        while _G.AutoSteal do
+            for _, v in pairs(workspace:GetDescendants()) do
+                if (v.Name == "Brain" or v.Name == "Cerebro") and v:IsA("BasePart") then
+                    local hrp = game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+                    if hrp and (v.Position - hrp.Position).Magnitude < 25 then
+                        firetouchinterest(hrp, v, 0)
+                        firetouchinterest(hrp, v, 1)
+                    end
+                end
+            end
+            task.wait(0.1)
+        end
+    end)
+end)
+
+Section3:CreateToggle("ESP HIGHLIGHT", function(state)
+    for _, v in pairs(game.Players:GetPlayers()) do
+        if v ~= game.Players.LocalPlayer and v.Character then
+            if state then
+                local h = Instance.new("Highlight", v.Character)
+                h.Name = "ZL_ESP"
+                h.FillColor = Color3.fromRGB(212, 175, 55)
+            else
+                if v.Character:FindFirstChild("ZL_ESP") then v.Character.ZL_ESP:Destroy() end
+            end
+        end
+    end
+end)
+
+-- PESTAÑA 4: Key (Config)
+local Tab4 = Window:CreateTab("Key")
+local Section4 = Tab4:CreateSection("CRÉDITOS")
+Section4:CreateLabel("Owner: ZL")
+Section4:CreateButton("GUARDAR CONFIG", function()
+    print("ZL Hub: Configuración Guardada.")
+end)
